@@ -284,15 +284,7 @@
     overflow-y: auto;
   }
   .receipt-actions { display: flex; flex-direction: column; gap: 10px; }
-  .receipt-actions-row { display: flex; gap: 10px; }
-  .receipt-actions-row .btn-secondary { flex: 1; }
-  a.btn-primary { text-decoration: none; }
-  .copied-note {
-    font-size: 12.5px;
-    color: var(--success);
-    text-align: center;
-    height: 16px;
-  }
+  .btn-primary:disabled { opacity: 0.6; cursor: default; }
 
   footer.page-foot {
     margin-top: 40px;
@@ -524,9 +516,8 @@
     <p class="dek">Confere o resumo abaixo. Se estiver tudo certo, manda pelo WhatsApp — a resposta chega direto pra mim.</p>
     <pre id="summary-text" class="mono"></pre>
     <div class="receipt-actions">
-      <button type="button" class="btn-primary" id="pdf-btn">Baixar PDF do briefing →</button>
-      <a id="whatsapp-link" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">Enviar via WhatsApp →</a>
-      <span class="submit-hint">No WhatsApp, anexe o PDF que você acabou de baixar.</span>
+      <button type="button" class="btn-primary" id="send-btn">Enviar briefing →</button>
+      <span class="submit-hint" id="send-hint">No celular, escolha o WhatsApp na tela de compartilhamento. No computador, o PDF é baixado e o WhatsApp abre pra você anexar.</span>
       <button type="button" class="btn-secondary" id="edit-btn">← Voltar e editar</button>
     </div>
   </section>
@@ -557,7 +548,6 @@
   const form = document.getElementById("briefing-form");
   const receipt = document.getElementById("receipt");
   const summaryEl = document.getElementById("summary-text");
-  const whatsappLink = document.getElementById("whatsapp-link");
 
   function val(name) {
     const el = form.elements[name];
@@ -625,9 +615,6 @@
     const summary = buildSummary();
     summaryEl.textContent = summary;
 
-    const waMessage = `Olá! Me chamo ${val("name") || ""}, acabei de preencher o briefing do projeto. Segue o PDF em anexo.`;
-    whatsappLink.href = `https://wa.me/${DEST_WHATSAPP}?text=${encodeURIComponent(waMessage)}`;
-
     form.hidden = true;
     receipt.hidden = false;
     receipt.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -659,7 +646,7 @@
   const ACCENT = [181, 84, 31];
   const BORDER = [215, 222, 217];
 
-  document.getElementById("pdf-btn").addEventListener("click", async () => {
+  async function buildBriefingPdf() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -818,7 +805,46 @@
     doc.text("By Diego Grizzi — Grizzi Web Applications", pageWidth / 2, pageHeight - 28, { align: "center" });
 
     const safeName = (val("name") || "briefing").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
-    doc.save(`briefing-${safeName}.pdf`);
+    return { blob: doc.output("blob"), filename: `briefing-${safeName}.pdf` };
+  }
+
+  document.getElementById("send-btn").addEventListener("click", async () => {
+    const sendBtn = document.getElementById("send-btn");
+    const sendHint = document.getElementById("send-hint");
+    sendBtn.disabled = true;
+    const originalLabel = sendBtn.textContent;
+    sendBtn.textContent = "Gerando PDF...";
+
+    try {
+      const { blob, filename } = await buildBriefingPdf();
+      const waText = `Olá! Me chamo ${val("name") || ""}, acabei de preencher o briefing do projeto.`;
+      const file = new File([blob], filename, { type: "application/pdf" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], text: waText, title: "Briefing de Projeto Web" });
+          sendHint.textContent = "Escolha o WhatsApp na lista para enviar.";
+          return;
+        } catch (shareErr) {
+          if (shareErr && shareErr.name === "AbortError") return;
+          /* share failed for another reason — fall through to the download fallback below */
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      window.open(`https://wa.me/${DEST_WHATSAPP}?text=${encodeURIComponent(waText)}`, "_blank");
+      sendHint.textContent = "PDF baixado — anexe-o na conversa do WhatsApp que abriu.";
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.textContent = originalLabel;
+    }
   });
 </script>
 
