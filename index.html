@@ -347,7 +347,7 @@
 <div class="page">
   <header class="letterhead">
     <div class="brand-row">
-      <img src="grizzi-icon.png" alt="" class="brand-icon" />
+      <img src="grizzi-icon.svg" alt="" class="brand-icon" />
       <div class="brand-text">
         <span class="brand-name">GRIZZI</span>
         <span class="brand-tagline">WEB APPLICATIONS</span>
@@ -670,7 +670,7 @@
 
     let iconW = 0;
     try {
-      const logo = await loadImageAsDataURL("grizzi-icon.png");
+      const logo = await loadImageAsDataURL("grizzi-icon.svg");
       const logoH = 26;
       iconW = logoH * logo.ratio;
       doc.addImage(logo.dataUrl, "PNG", margin, y, iconW, logoH);
