@@ -367,11 +367,13 @@
         </div>
         <div class="field">
           <label class="field-label" for="f-email">E-mail<span class="req">*</span></label>
-          <input type="email" id="f-email" name="email" required autocomplete="email" />
+          <input type="email" id="f-email" name="email" required autocomplete="email" placeholder="nome@email.com" />
+          <p class="field-error" id="email-error" hidden>Digite um e-mail válido.</p>
         </div>
         <div class="field">
           <label class="field-label" for="f-whatsapp">WhatsApp<span class="req">*</span></label>
-          <input type="tel" id="f-whatsapp" name="whatsapp" required autocomplete="tel" placeholder="(00) 00000-0000" />
+          <input type="tel" id="f-whatsapp" name="whatsapp" required autocomplete="tel" placeholder="(00) 00000-0000" inputmode="numeric" maxlength="15" />
+          <p class="field-error" id="whatsapp-error" hidden>Digite um WhatsApp válido, com DDD.</p>
         </div>
       </div>
     </section>
@@ -549,6 +551,31 @@
   const receipt = document.getElementById("receipt");
   const summaryEl = document.getElementById("summary-text");
 
+  function formatWhatsapp(digits) {
+    digits = digits.slice(0, 11);
+    if (digits.length === 0) return "";
+    if (digits.length <= 2) return `(${digits}`;
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  }
+  const whatsappInput = document.getElementById("f-whatsapp");
+  whatsappInput.addEventListener("input", (e) => {
+    e.target.value = formatWhatsapp(e.target.value.replace(/\D/g, ""));
+  });
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+  }
+  function isValidWhatsapp(value) {
+    return /^\(\d{2}\) \d{5}-\d{4}$/.test(value);
+  }
+  document.getElementById("f-email").addEventListener("input", () => {
+    document.getElementById("email-error").hidden = true;
+  });
+  whatsappInput.addEventListener("input", () => {
+    document.getElementById("whatsapp-error").hidden = true;
+  });
+
   function val(name) {
     const el = form.elements[name];
     if (!el) return "";
@@ -603,6 +630,22 @@
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!form.reportValidity()) return;
+
+    const emailError = document.getElementById("email-error");
+    if (!isValidEmail(val("email"))) {
+      emailError.hidden = false;
+      emailError.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    emailError.hidden = true;
+
+    const whatsappError = document.getElementById("whatsapp-error");
+    if (!isValidWhatsapp(val("whatsapp"))) {
+      whatsappError.hidden = false;
+      whatsappError.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    whatsappError.hidden = true;
 
     const featuresError = document.getElementById("features-error");
     if (checkedList("features").length === 0 && !val("featureOther")) {
