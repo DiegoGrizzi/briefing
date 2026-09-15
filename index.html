@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Briefing de Projeto Web</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+  :root {
+    --bg: #eef1f0;
+    --surface: #ffffff;
+    --surface-2: #f5f7f6;
+    --ink: #1c2624;
+    --muted: #5c6b67;
+    --accent: #b5541f;
+    --accent-ink: #fff7ef;
+    --border: #d7ded9;
+    --border-strong: #b9c4be;
+    --success: #2f7a5c;
+    --success-bg: #e6f2ec;
+    --shadow: 0 1px 2px rgba(28, 38, 36, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12181a;
+      --surface: #1a2224;
+      --surface-2: #202a2c;
+      --ink: #eaf0ec;
+      --muted: #8fa098;
+      --accent: #e08a4b;
+      --accent-ink: #17110a;
+      --border: #2a3436;
+      --border-strong: #3a4548;
+      --success: #59c79a;
+      --success-bg: #1a2e27;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12181a;
+    --surface: #1a2224;
+    --surface-2: #202a2c;
+    --ink: #eaf0ec;
+    --muted: #8fa098;
+    --accent: #e08a4b;
+    --accent-ink: #17110a;
+    --border: #2a3436;
+    --border-strong: #3a4548;
+    --success: #59c79a;
+    --success-bg: #1a2e27;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    line-height: 1.55;
+    padding-inline: 20px;
+    padding-block: 56px 96px;
+  }
+
+  img { max-width: 100%; }
+
+  .mono {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  progress[value] {
+    -webkit-appearance: none;
+    appearance: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    border: none;
+    z-index: 50;
+  }
+  progress[value]::-webkit-progress-bar { background: transparent; }
+  progress[value]::-webkit-progress-value { background: var(--accent); transition: width 0.1s linear; }
+  progress[value]::-moz-progress-bar { background: var(--accent); }
+
+  .page {
+    max-width: 700px;
+    margin-inline: auto;
+  }
+
+  header.letterhead {
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .eyebrow::before {
+    content: "";
+    width: 22px;
+    height: 1.5px;
+    background: var(--accent);
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(28px, 5vw, 38px);
+    line-height: 1.15;
+    text-wrap: balance;
+    margin: 0 0 14px;
+  }
+  .dek {
+    color: var(--muted);
+    max-width: 52ch;
+    font-size: 15px;
+  }
+
+  form { display: flex; flex-direction: column; gap: 20px; }
+
+  .sheet {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    box-shadow: var(--shadow);
+    padding: 26px 26px 28px;
+  }
+
+  .sheet-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-num {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+  .sheet-title {
+    font-family: "IBM Plex Serif", Georgia, serif;
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .sheet-hint {
+    margin: -8px 0 16px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label.field-label {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .field-label .req { color: var(--accent); margin-left: 3px; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  textarea {
+    font: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: 3px;
+    padding: 11px 12px;
+    width: 100%;
+  }
+  textarea { resize: vertical; min-height: 76px; }
+  input:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 16px; }
+  @media (max-width: 520px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .options.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 520px) { .options.cols-2 { grid-template-columns: 1fr; } }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14.5px;
+  }
+  .opt:has(input:checked) {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  }
+  .opt input { accent-color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+  .opt .opt-text { display: flex; flex-direction: column; }
+  .opt .opt-sub { color: var(--muted); font-size: 12.5px; margin-top: 1px; }
+
+  .other-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 3px;
+  }
+  .other-row input[type="text"] { border: none; background: transparent; padding: 0; }
+  .other-row label { font-size: 14.5px; flex-shrink: 0; color: var(--muted); }
+
+  button {
+    font: inherit;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: 1px solid var(--accent);
+    font-weight: 600;
+    font-size: 14.5px;
+    padding: 15px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .btn-primary:hover { filter: brightness(1.06); }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+    font-size: 13.5px;
+    padding: 11px 16px;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .submit-row { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .submit-hint { font-size: 12.5px; color: var(--muted); }
+
+  /* Receipt / confirmation view */
+  #receipt { display: flex; flex-direction: column; gap: 18px; }
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    background: var(--success-bg);
+    color: var(--success);
+    border: 1px solid var(--success);
+    border-radius: 3px;
+    padding: 6px 12px;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  #summary-text {
+    white-space: pre-wrap;
+    font-size: 13.5px;
+    line-height: 1.7;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 20px;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+  .receipt-actions { display: flex; flex-direction: column; gap: 10px; }
+  .receipt-actions-row { display: flex; gap: 10px; }
+  .receipt-actions-row .btn-secondary { flex: 1; }
+  a.btn-primary { text-decoration: none; }
+  .copied-note {
+    font-size: 12.5px;
+    color: var(--success);
+    text-align: center;
+    height: 16px;
+  }
+
+  footer.page-foot {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+
+<progress id="scroll-progress" value="0" max="100"></progress>
+
+<div class="page">
+  <header class="letterhead">
+    <div class="eyebrow mono">Briefing de projeto</div>
+    <h1>Vamos falar sobre o seu site.</h1>
+    <p class="dek">Preenche esse formulário com calma — quanto mais detalhe, mais precisa fica a proposta de valor e prazo. Leva uns 5 minutos.</p>
+  </header>
+
+  <form id="briefing-form" novalidate>
+    <section class="sheet">
+      <div class="sheet-head">
+        <span class="sheet-num mono">01</span>
+        <h2 class="sheet-title">Sobre você</h2>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label class="field-label" for="f-name">Nome<span class="req">*</span></label>
+          <input type="text" id="f-name" name="name" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-company">Empresa / marca</label>
+          <input type="text" id="f-company" name="company" autocomplete="organization" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-email">E-mail<span class="req">*</span></label>
+          <input type="email" id="f-email" name="email" required autocomplete="email" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-whatsapp">WhatsApp<span class="req">*</span></label>
+          <input type="tel" id="f-whatsapp" name="whatsapp" required autocomplete="tel" placeholder="(00) 00000-0000" />
+        </div>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head">
+        <span class="sheet-num mono">02</span>
+        <h2 class="sheet-title">O projeto</h2>
+      </div>
+      <div class="field">
+        <span class="field-label">Que tipo de site é<span class="req">*</span></span>
+        <div class="options cols-2" role="radiogroup" aria-label="Tipo de site">
+          <label class="opt"><input type="radio" name="projectType" value="Institucional / portfólio" required /><span class="opt-text">Institucional / portfólio</span></label>
+          <label class="opt"><input type="radio" name="projectType" value="Landing page" /><span class="opt-text">Landing page<span class="opt-sub">uma página, foco em conversão</span></span></label>
+          <label class="opt"><input type="radio" name="projectType" value="Blog / conteúdo" /><span class="opt-text">Blog / conteúdo</span></label>
+          <label class="opt"><input type="radio" name="projectType" value="Loja virtual (e-commerce)" /><span class="opt-text">Loja virtual (e-commerce)</span></label>
+          <label class="opt"><input type="radio" name="projectType" value="Sistema / plataforma sob medida" /><span class="opt-text">Sistema / plataforma<span class="opt-sub">login, painel, etc.</span></span></label>
+          <label class="opt"><input type="radio" name="projectType" value="Ainda não sei" /><span class="opt-text">Ainda não sei</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Situação atual<span class="req">*</span></span>
+        <div class="options cols-2" role="radiogroup" aria-label="Situação atual do site">
+          <label class="opt"><input type="radio" name="hasSite" value="Já tenho site, é uma reforma" required /><span class="opt-text">Já tenho site — é uma reforma</span></label>
+          <label class="opt"><input type="radio" name="hasSite" value="Não tenho, é o primeiro" /><span class="opt-text">Não tenho — é o primeiro</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="f-goal">Em uma frase, o que esse site precisa fazer?<span class="req">*</span></label>
+        <textarea id="f-goal" name="goal" required placeholder="Ex: vender minhas peças direto pro cliente final, com pagamento e frete calculados automaticamente."></textarea>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head">
+        <span class="sheet-num mono">03</span>
+        <h2 class="sheet-title">Funcionalidades</h2>
+      </div>
+      <p class="sheet-hint">Marque tudo que já sabe que vai precisar — não tem problema deixar pra decidir depois.</p>
+      <div class="options cols-2">
+        <label class="opt"><input type="checkbox" name="features" value="Cadastro / login de usuários" /><span class="opt-text">Cadastro / login de usuários</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Carrinho e pagamento online" /><span class="opt-text">Carrinho e pagamento online</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Cálculo de frete automático" /><span class="opt-text">Cálculo de frete automático</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Painel administrativo" /><span class="opt-text">Painel administrativo</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Blog / área de notícias" /><span class="opt-text">Blog / área de notícias</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Formulário de contato" /><span class="opt-text">Formulário de contato</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Integração com WhatsApp" /><span class="opt-text">Integração com WhatsApp</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Agendamento / reservas" /><span class="opt-text">Agendamento / reservas</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Programa de fidelidade / pontos" /><span class="opt-text">Fidelidade / pontos</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Múltiplos idiomas" /><span class="opt-text">Múltiplos idiomas</span></label>
+        <label class="opt"><input type="checkbox" name="features" value="Ainda não sei, preciso de ajuda" /><span class="opt-text">Não sei — preciso de ajuda</span></label>
+      </div>
+      <div class="other-row" style="margin-top: 8px;">
+        <label for="f-feature-other">Outra:</label>
+        <input type="text" id="f-feature-other" name="featureOther" placeholder="descreva aqui" />
+      </div>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head">
+        <span class="sheet-num mono">04</span>
+        <h2 class="sheet-title">Conteúdo e visual</h2>
+      </div>
+      <div class="field">
+        <span class="field-label">Fotos e textos<span class="req">*</span></span>
+        <div class="options cols-2" role="radiogroup" aria-label="Situação do conteúdo">
+          <label class="opt"><input type="radio" name="contentStatus" value="Já tenho fotos e textos prontos" required /><span class="opt-text">Já tenho tudo pronto</span></label>
+          <label class="opt"><input type="radio" name="contentStatus" value="Só tenho fotos" /><span class="opt-text">Só tenho fotos</span></label>
+          <label class="opt"><input type="radio" name="contentStatus" value="Só tenho textos" /><span class="opt-text">Só tenho textos</span></label>
+          <label class="opt"><input type="radio" name="contentStatus" value="Nada ainda, preciso de ajuda" /><span class="opt-text">Nada ainda — preciso de ajuda</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Identidade visual<span class="req">*</span></span>
+        <div class="options cols-2" role="radiogroup" aria-label="Situação da identidade visual">
+          <label class="opt"><input type="radio" name="brandStatus" value="Já tenho logo e paleta de cores" required /><span class="opt-text">Já tenho logo e cores</span></label>
+          <label class="opt"><input type="radio" name="brandStatus" value="Tenho logo mas não paleta definida" /><span class="opt-text">Tenho logo, não a paleta</span></label>
+          <label class="opt"><input type="radio" name="brandStatus" value="Preciso criar do zero" /><span class="opt-text">Preciso criar do zero</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="f-refs">Sites que você gosta (referências)</label>
+        <textarea id="f-refs" name="references" placeholder="Cola aqui links ou nomes de sites que você curte — não precisa ser do mesmo ramo."></textarea>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head">
+        <span class="sheet-num mono">05</span>
+        <h2 class="sheet-title">Prazo e orçamento</h2>
+      </div>
+      <div class="field">
+        <span class="field-label">Prazo desejado<span class="req">*</span></span>
+        <div class="options cols-2" role="radiogroup" aria-label="Prazo desejado">
+          <label class="opt"><input type="radio" name="timeline" value="Urgente, até 2 semanas" required /><span class="opt-text">Urgente — até 2 semanas</span></label>
+          <label class="opt"><input type="radio" name="timeline" value="Cerca de 1 mês" /><span class="opt-text">Cerca de 1 mês</span></label>
+          <label class="opt"><input type="radio" name="timeline" value="2 a 3 meses" /><span class="opt-text">2 a 3 meses</span></label>
+          <label class="opt"><input type="radio" name="timeline" value="Sem pressa" /><span class="opt-text">Sem pressa</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Faixa de orçamento em mente<span class="req">*</span></span>
+        <div class="options" role="radiogroup" aria-label="Faixa de orçamento">
+          <label class="opt"><input type="radio" name="budget" value="Até R$3.000" required /><span class="opt-text">Até R$3.000</span></label>
+          <label class="opt"><input type="radio" name="budget" value="R$3.000 – R$8.000" /><span class="opt-text">R$3.000 – R$8.000</span></label>
+          <label class="opt"><input type="radio" name="budget" value="R$8.000 – R$20.000" /><span class="opt-text">R$8.000 – R$20.000</span></label>
+          <label class="opt"><input type="radio" name="budget" value="Acima de R$20.000" /><span class="opt-text">Acima de R$20.000</span></label>
+          <label class="opt"><input type="radio" name="budget" value="Prefiro ver o escopo antes de falar de valor" /><span class="opt-text">Prefiro ver o escopo antes de falar de valor</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-label">Forma de pagamento imaginada<span class="req">*</span></span>
+        <div class="options cols-2" role="radiogroup" aria-label="Forma de pagamento">
+          <label class="opt"><input type="radio" name="paymentPref" value="À vista" required /><span class="opt-text">À vista</span></label>
+          <label class="opt"><input type="radio" name="paymentPref" value="Parcelado" /><span class="opt-text">Parcelado</span></label>
+          <label class="opt"><input type="radio" name="paymentPref" value="Entrada + entrega" /><span class="opt-text">Entrada + entrega</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <div class="sheet-head">
+        <span class="sheet-num mono">06</span>
+        <h2 class="sheet-title">Observações</h2>
+      </div>
+      <div class="field">
+        <label class="field-label" for="f-notes">Mais alguma coisa que eu deveria saber?</label>
+        <textarea id="f-notes" name="notes" placeholder="Concorrentes, restrições técnicas, algo que já tentaram e não funcionou..."></textarea>
+      </div>
+    </section>
+
+    <div class="submit-row">
+      <button type="submit" class="btn-primary">Revisar e enviar briefing →</button>
+      <span class="submit-hint">No próximo passo você confere tudo antes de mandar.</span>
+    </div>
+  </form>
+
+  <section id="receipt" hidden>
+    <span class="stamp mono">✓ Briefing pronto</span>
+    <p class="dek">Confere o resumo abaixo. Se estiver tudo certo, manda pelo WhatsApp — a resposta chega direto pra mim.</p>
+    <pre id="summary-text" class="mono"></pre>
+    <div class="receipt-actions">
+      <a id="whatsapp-link" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">Enviar via WhatsApp →</a>
+      <div class="receipt-actions-row">
+        <button type="button" class="btn-secondary" id="copy-btn">Copiar texto</button>
+        <button type="button" class="btn-secondary" id="edit-btn">← Voltar e editar</button>
+      </div>
+      <div class="copied-note" id="copied-note"></div>
+    </div>
+  </section>
+
+  <footer class="page-foot mono">briefing de projeto — preenchido em <span id="foot-date"></span></footer>
+</div>
+
+<script>
+  // WhatsApp number this briefing is delivered to — swap this if a
+  // different number should receive project inquiries.
+  const DEST_WHATSAPP = "5581993520896";
+
+  document.getElementById("foot-date").textContent = new Date().toLocaleDateString("pt-BR");
+
+  // Slim scroll-progress rule.
+  const progressEl = document.getElementById("scroll-progress");
+  function updateProgress() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progressEl.value = max > 0 ? (window.scrollY / max) * 100 : 0;
+  }
+  document.addEventListener("scroll", updateProgress, { passive: true });
+  updateProgress();
+
+  const form = document.getElementById("briefing-form");
+  const receipt = document.getElementById("receipt");
+  const summaryEl = document.getElementById("summary-text");
+  const whatsappLink = document.getElementById("whatsapp-link");
+
+  function val(name) {
+    const el = form.elements[name];
+    if (!el) return "";
+    return (el.value || "").trim();
+  }
+  function radioVal(name) {
+    const el = form.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : "—";
+  }
+  function checkedList(name) {
+    return Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map((el) => el.value);
+  }
+
+  function buildSummary() {
+    const features = checkedList("features");
+    const featureOther = val("featureOther");
+    if (featureOther) features.push(featureOther);
+
+    const lines = [
+      `📋 BRIEFING DE PROJETO — ${val("name") || "sem nome"}`,
+      "",
+      "👤 Contato",
+      `Nome: ${val("name")}`,
+      `Empresa: ${val("company") || "—"}`,
+      `E-mail: ${val("email")}`,
+      `WhatsApp: ${val("whatsapp")}`,
+      "",
+      "🌐 Projeto",
+      `Tipo: ${radioVal("projectType")}`,
+      `Situação atual: ${radioVal("hasSite")}`,
+      `Objetivo: "${val("goal")}"`,
+      "",
+      "⚙️ Funcionalidades",
+      features.length ? features.map((f) => `- ${f}`).join("\n") : "- (nenhuma marcada)",
+      "",
+      "🎨 Conteúdo & visual",
+      `Conteúdo: ${radioVal("contentStatus")}`,
+      `Identidade visual: ${radioVal("brandStatus")}`,
+      `Referências: ${val("references") || "—"}`,
+      "",
+      "📅 Prazo & orçamento",
+      `Prazo: ${radioVal("timeline")}`,
+      `Orçamento: ${radioVal("budget")}`,
+      `Pagamento: ${radioVal("paymentPref")}`,
+      "",
+      "📝 Observações",
+      val("notes") || "—",
+    ];
+    return lines.join("\n");
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+
+    const summary = buildSummary();
+    summaryEl.textContent = summary;
+    whatsappLink.href = `https://wa.me/${DEST_WHATSAPP}?text=${encodeURIComponent(summary)}`;
+
+    form.hidden = true;
+    receipt.hidden = false;
+    receipt.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("edit-btn").addEventListener("click", () => {
+    receipt.hidden = true;
+    form.hidden = false;
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("copy-btn").addEventListener("click", async () => {
+    const note = document.getElementById("copied-note");
+    try {
+      await navigator.clipboard.writeText(summaryEl.textContent);
+      note.textContent = "Copiado!";
+    } catch {
+      note.textContent = "Não foi possível copiar automaticamente — selecione o texto acima.";
+    }
+    setTimeout(() => (note.textContent = ""), 2500);
+  });
+</script>
+
+</body>
+</html>
