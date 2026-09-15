@@ -315,14 +315,6 @@
     margin: 10px 0 0;
   }
 
-  .policy-note {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 12px 14px;
-    font-size: 14px;
-    color: var(--ink);
-  }
 </style>
 </head>
 <body>
@@ -473,9 +465,10 @@
         <p class="sheet-hint" style="margin-top: 10px;">Isso me dá uma noção da sua expectativa — o valor final é calculado com base no escopo real do projeto, depois de conversarmos.</p>
       </div>
       <div class="field">
-        <span class="field-label">Forma de pagamento</span>
-        <div class="policy-note">
-          <strong>Condição padrão:</strong> 50% de entrada para iniciar o projeto e 50% na entrega. Casos específicos podem ser combinados na proposta.
+        <span class="field-label">Forma de pagamento<span class="req">*</span></span>
+        <div class="options cols-2" role="radiogroup" aria-label="Forma de pagamento">
+          <label class="opt"><input type="radio" name="paymentPref" value="À vista (50% entrada + 50% entrega)" required /><span class="opt-text">À vista<span class="opt-sub">50% de entrada + 50% na entrega</span></span></label>
+          <label class="opt"><input type="radio" name="paymentPref" value="Cartão" /><span class="opt-text">Cartão<span class="opt-sub">parcelamento a combinar</span></span></label>
         </div>
       </div>
     </section>
@@ -580,7 +573,7 @@
       "📅 Prazo & orçamento",
       `Prazo: ${radioVal("timeline")}`,
       `Orçamento: ${radioVal("budget")}`,
-      `Pagamento: 50% de entrada + 50% na entrega`,
+      `Pagamento: ${radioVal("paymentPref")}`,
       "",
       "📝 Observações",
       val("notes") || "—",
@@ -617,25 +610,173 @@
     form.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  document.getElementById("pdf-btn").addEventListener("click", () => {
+  function loadImageAsDataURL(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        resolve({ dataUrl: canvas.toDataURL("image/png"), ratio: img.naturalWidth / img.naturalHeight });
+      };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  const INK = [28, 38, 36];
+  const MUTED = [92, 107, 103];
+  const ACCENT = [181, 84, 31];
+  const BORDER = [215, 222, 217];
+
+  document.getElementById("pdf-btn").addEventListener("click", async () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
-    const margin = 48;
-    const maxWidth = 595.28 - margin * 2;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 50;
+    const contentWidth = pageWidth - margin * 2;
+    let y = margin;
+
+    try {
+      const logo = await loadImageAsDataURL("grizzi-logo.png");
+      const logoH = 34;
+      doc.addImage(logo.dataUrl, "PNG", margin, y, logoH * logo.ratio, logoH);
+    } catch (e) {
+      /* logo optional */
+    }
+    y += 58;
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("Briefing de Projeto Web", margin, 56);
+    doc.setFontSize(19);
+    doc.setTextColor(...INK);
+    doc.text("Briefing de Projeto Web", margin, y);
 
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(120, 120, 120);
-    doc.text(`Grizzi Web Applications — gerado em ${new Date().toLocaleDateString("pt-BR")}`, margin, 74);
+    doc.setFontSize(9.5);
+    doc.setTextColor(...MUTED);
+    doc.text(`gerado em ${new Date().toLocaleDateString("pt-BR")}`, pageWidth - margin, y, { align: "right" });
+    y += 12;
 
-    doc.setTextColor(20, 20, 20);
-    doc.setFontSize(11);
-    const lines = doc.splitTextToSize(summaryEl.textContent, maxWidth);
-    doc.text(lines, margin, 100);
+    doc.setDrawColor(...ACCENT);
+    doc.setLineWidth(1.4);
+    doc.line(margin, y, margin + 34, y);
+    y += 34;
+
+    const features = checkedList("features");
+    const featureOther = val("featureOther");
+    if (featureOther) features.push(featureOther);
+
+    const sections = [
+      {
+        num: "01",
+        title: "Sobre você",
+        rows: [
+          ["Nome", val("name")],
+          ["Empresa / marca", val("company") || "—"],
+          ["E-mail", val("email")],
+          ["WhatsApp", val("whatsapp")],
+        ],
+      },
+      {
+        num: "02",
+        title: "O projeto",
+        rows: [
+          ["Tipo de site", radioVal("projectType")],
+          ["Situação atual", radioVal("hasSite")],
+          ["Objetivo", val("goal")],
+        ],
+      },
+      {
+        num: "03",
+        title: "Funcionalidades",
+        list: features.length ? features : ["(nenhuma selecionada)"],
+      },
+      {
+        num: "04",
+        title: "Conteúdo e visual",
+        rows: [
+          ["Fotos e textos", radioVal("contentStatus")],
+          ["Identidade visual", radioVal("brandStatus")],
+          ["Referências", val("references") || "—"],
+        ],
+      },
+      {
+        num: "05",
+        title: "Prazo e orçamento",
+        rows: [
+          ["Prazo desejado", radioVal("timeline")],
+          ["Faixa de orçamento", radioVal("budget")],
+          ["Forma de pagamento", radioVal("paymentPref")],
+        ],
+      },
+      {
+        num: "06",
+        title: "Observações",
+        rows: [["", val("notes") || "—"]],
+      },
+    ];
+
+    const ensureSpace = (needed) => {
+      if (y + needed > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+    };
+
+    for (const section of sections) {
+      ensureSpace(50);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(...ACCENT);
+      doc.text(section.num, margin, y);
+
+      doc.setFontSize(13.5);
+      doc.setTextColor(...INK);
+      doc.text(section.title, margin + 26, y);
+      y += 8;
+
+      doc.setDrawColor(...BORDER);
+      doc.setLineWidth(0.75);
+      doc.line(margin, y, pageWidth - margin, y);
+      y += 20;
+
+      if (section.rows) {
+        for (const [label, value] of section.rows) {
+          ensureSpace(34);
+          if (label) {
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(...MUTED);
+            doc.text(label.toUpperCase(), margin, y);
+            y += 12;
+          }
+          doc.setFontSize(11);
+          doc.setTextColor(...INK);
+          const lines = doc.splitTextToSize(String(value), contentWidth);
+          ensureSpace(lines.length * 14);
+          doc.text(lines, margin, y);
+          y += lines.length * 14 + 10;
+        }
+      } else if (section.list) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(...INK);
+        for (const item of section.list) {
+          ensureSpace(16);
+          doc.text(`•  ${item}`, margin, y);
+          y += 16;
+        }
+      }
+      y += 16;
+    }
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...MUTED);
+    doc.text("By Diego Grizzi — Grizzi Web Applications", pageWidth / 2, pageHeight - 28, { align: "center" });
 
     const safeName = (val("name") || "briefing").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
     doc.save(`briefing-${safeName}.pdf`);
