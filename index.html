@@ -54,6 +54,7 @@
   }
 
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
 
   body {
     margin: 0;
@@ -299,6 +300,29 @@
     font-size: 12px;
     color: var(--muted);
   }
+  footer.page-foot div + div { margin-top: 4px; }
+
+  .brand-logo {
+    display: block;
+    height: 84px;
+    width: auto;
+    margin: 0 0 22px;
+  }
+
+  .field-error {
+    color: var(--accent);
+    font-size: 12.5px;
+    margin: 10px 0 0;
+  }
+
+  .policy-note {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 12px 14px;
+    font-size: 14px;
+    color: var(--ink);
+  }
 </style>
 </head>
 <body>
@@ -307,6 +331,7 @@
 
 <div class="page">
   <header class="letterhead">
+    <img src="grizzi-logo.png" alt="Grizzi Web Applications" class="brand-logo" />
     <div class="eyebrow mono">Briefing de projeto</div>
     <h1>Vamos falar sobre o seu site.</h1>
     <p class="dek">Preenche esse formulário com calma — quanto mais detalhe, mais precisa fica a proposta de valor e prazo. Leva uns 5 minutos.</p>
@@ -347,7 +372,7 @@
         <span class="field-label">Que tipo de site é<span class="req">*</span></span>
         <div class="options cols-2" role="radiogroup" aria-label="Tipo de site">
           <label class="opt"><input type="radio" name="projectType" value="Institucional / portfólio" required /><span class="opt-text">Institucional / portfólio</span></label>
-          <label class="opt"><input type="radio" name="projectType" value="Landing page" /><span class="opt-text">Landing page<span class="opt-sub">uma página, foco em conversão</span></span></label>
+          <label class="opt"><input type="radio" name="projectType" value="Landing page" /><span class="opt-text">Landing page<span class="opt-sub">página única, para um objetivo específico</span></span></label>
           <label class="opt"><input type="radio" name="projectType" value="Blog / conteúdo" /><span class="opt-text">Blog / conteúdo</span></label>
           <label class="opt"><input type="radio" name="projectType" value="Loja virtual (e-commerce)" /><span class="opt-text">Loja virtual (e-commerce)</span></label>
           <label class="opt"><input type="radio" name="projectType" value="Sistema / plataforma sob medida" /><span class="opt-text">Sistema / plataforma<span class="opt-sub">login, painel, etc.</span></span></label>
@@ -370,9 +395,9 @@
     <section class="sheet">
       <div class="sheet-head">
         <span class="sheet-num mono">03</span>
-        <h2 class="sheet-title">Funcionalidades</h2>
+        <h2 class="sheet-title">Funcionalidades<span class="req">*</span></h2>
       </div>
-      <p class="sheet-hint">Marque tudo que já sabe que vai precisar — não tem problema deixar pra decidir depois.</p>
+      <p class="sheet-hint">Marque tudo que já sabe que vai precisar. Se ainda não souber, marque "Não sei — preciso de ajuda".</p>
       <div class="options cols-2">
         <label class="opt"><input type="checkbox" name="features" value="Cadastro / login de usuários" /><span class="opt-text">Cadastro / login de usuários</span></label>
         <label class="opt"><input type="checkbox" name="features" value="Carrinho e pagamento online" /><span class="opt-text">Carrinho e pagamento online</span></label>
@@ -390,6 +415,7 @@
         <label for="f-feature-other">Outra:</label>
         <input type="text" id="f-feature-other" name="featureOther" placeholder="descreva aqui" />
       </div>
+      <p class="field-error" id="features-error" hidden>Marque pelo menos uma opção acima.</p>
     </section>
 
     <section class="sheet">
@@ -428,11 +454,12 @@
       <div class="field">
         <span class="field-label">Prazo desejado<span class="req">*</span></span>
         <div class="options cols-2" role="radiogroup" aria-label="Prazo desejado">
-          <label class="opt"><input type="radio" name="timeline" value="Urgente, até 2 semanas" required /><span class="opt-text">Urgente — até 2 semanas</span></label>
+          <label class="opt"><input type="radio" name="timeline" value="Urgente, 2 a 4 semanas" required /><span class="opt-text">Urgente — 2 a 4 semanas</span></label>
           <label class="opt"><input type="radio" name="timeline" value="Cerca de 1 mês" /><span class="opt-text">Cerca de 1 mês</span></label>
           <label class="opt"><input type="radio" name="timeline" value="2 a 3 meses" /><span class="opt-text">2 a 3 meses</span></label>
           <label class="opt"><input type="radio" name="timeline" value="Sem pressa" /><span class="opt-text">Sem pressa</span></label>
         </div>
+        <p class="sheet-hint" style="margin-top: 10px;">Esse prazo é o que você imagina — a gente confirma juntos o que é viável na proposta.</p>
       </div>
       <div class="field">
         <span class="field-label">Faixa de orçamento em mente<span class="req">*</span></span>
@@ -443,13 +470,12 @@
           <label class="opt"><input type="radio" name="budget" value="Acima de R$20.000" /><span class="opt-text">Acima de R$20.000</span></label>
           <label class="opt"><input type="radio" name="budget" value="Prefiro ver o escopo antes de falar de valor" /><span class="opt-text">Prefiro ver o escopo antes de falar de valor</span></label>
         </div>
+        <p class="sheet-hint" style="margin-top: 10px;">Isso me dá uma noção da sua expectativa — o valor final é calculado com base no escopo real do projeto, depois de conversarmos.</p>
       </div>
       <div class="field">
-        <span class="field-label">Forma de pagamento imaginada<span class="req">*</span></span>
-        <div class="options cols-2" role="radiogroup" aria-label="Forma de pagamento">
-          <label class="opt"><input type="radio" name="paymentPref" value="À vista" required /><span class="opt-text">À vista</span></label>
-          <label class="opt"><input type="radio" name="paymentPref" value="Parcelado" /><span class="opt-text">Parcelado</span></label>
-          <label class="opt"><input type="radio" name="paymentPref" value="Entrada + entrega" /><span class="opt-text">Entrada + entrega</span></label>
+        <span class="field-label">Forma de pagamento</span>
+        <div class="policy-note">
+          <strong>Condição padrão:</strong> 50% de entrada para iniciar o projeto e 50% na entrega. Casos específicos podem ser combinados na proposta.
         </div>
       </div>
     </section>
@@ -476,22 +502,24 @@
     <p class="dek">Confere o resumo abaixo. Se estiver tudo certo, manda pelo WhatsApp — a resposta chega direto pra mim.</p>
     <pre id="summary-text" class="mono"></pre>
     <div class="receipt-actions">
+      <button type="button" class="btn-primary" id="pdf-btn">Baixar PDF do briefing →</button>
       <a id="whatsapp-link" class="btn-primary" href="#" target="_blank" rel="noopener noreferrer">Enviar via WhatsApp →</a>
-      <div class="receipt-actions-row">
-        <button type="button" class="btn-secondary" id="copy-btn">Copiar texto</button>
-        <button type="button" class="btn-secondary" id="edit-btn">← Voltar e editar</button>
-      </div>
-      <div class="copied-note" id="copied-note"></div>
+      <span class="submit-hint">No WhatsApp, anexe o PDF que você acabou de baixar.</span>
+      <button type="button" class="btn-secondary" id="edit-btn">← Voltar e editar</button>
     </div>
   </section>
 
-  <footer class="page-foot mono">briefing de projeto — preenchido em <span id="foot-date"></span></footer>
+  <footer class="page-foot mono">
+    <div>By Diego Grizzi</div>
+    <div>briefing preenchido em <span id="foot-date"></span></div>
+  </footer>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   // WhatsApp number this briefing is delivered to — swap this if a
   // different number should receive project inquiries.
-  const DEST_WHATSAPP = "5581993520896";
+  const DEST_WHATSAPP = "5581993871220";
 
   document.getElementById("foot-date").textContent = new Date().toLocaleDateString("pt-BR");
 
@@ -552,7 +580,7 @@
       "📅 Prazo & orçamento",
       `Prazo: ${radioVal("timeline")}`,
       `Orçamento: ${radioVal("budget")}`,
-      `Pagamento: ${radioVal("paymentPref")}`,
+      `Pagamento: 50% de entrada + 50% na entrega`,
       "",
       "📝 Observações",
       val("notes") || "—",
@@ -564,9 +592,19 @@
     e.preventDefault();
     if (!form.reportValidity()) return;
 
+    const featuresError = document.getElementById("features-error");
+    if (checkedList("features").length === 0 && !val("featureOther")) {
+      featuresError.hidden = false;
+      featuresError.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    featuresError.hidden = true;
+
     const summary = buildSummary();
     summaryEl.textContent = summary;
-    whatsappLink.href = `https://wa.me/${DEST_WHATSAPP}?text=${encodeURIComponent(summary)}`;
+
+    const waMessage = `Olá! Me chamo ${val("name") || ""}, acabei de preencher o briefing do projeto. Segue o PDF em anexo.`;
+    whatsappLink.href = `https://wa.me/${DEST_WHATSAPP}?text=${encodeURIComponent(waMessage)}`;
 
     form.hidden = true;
     receipt.hidden = false;
@@ -579,15 +617,28 @@
     form.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  document.getElementById("copy-btn").addEventListener("click", async () => {
-    const note = document.getElementById("copied-note");
-    try {
-      await navigator.clipboard.writeText(summaryEl.textContent);
-      note.textContent = "Copiado!";
-    } catch {
-      note.textContent = "Não foi possível copiar automaticamente — selecione o texto acima.";
-    }
-    setTimeout(() => (note.textContent = ""), 2500);
+  document.getElementById("pdf-btn").addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const margin = 48;
+    const maxWidth = 595.28 - margin * 2;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("Briefing de Projeto Web", margin, 56);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(120, 120, 120);
+    doc.text(`Grizzi Web Applications — gerado em ${new Date().toLocaleDateString("pt-BR")}`, margin, 74);
+
+    doc.setTextColor(20, 20, 20);
+    doc.setFontSize(11);
+    const lines = doc.splitTextToSize(summaryEl.textContent, maxWidth);
+    doc.text(lines, margin, 100);
+
+    const safeName = (val("name") || "briefing").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+    doc.save(`briefing-${safeName}.pdf`);
   });
 </script>
 
